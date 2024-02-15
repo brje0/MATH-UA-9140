@@ -76,20 +76,14 @@ class Matrix:
         return 0 != self.vals[0][0] * self.vals[1][1] - self.vals[0][1] * self.vals[1][0]
 
     def transpose(self):
-        res = []
-        for j in range(self.q):
-            res.append([self.vals[i][j] for i in range(self.p)])
-
-        return Matrix(res)
+        return Matrix([ [ self[i][j] for i in range(self.p) ] for j in range(self.q) ])
 
     def __add__(self, rhs):
         if self.p != rhs.p or self.q != rhs.q:
             print("Attempting to add matrices with different dimensions.")
             return
 
-        res = [ [ self[i][j] + rhs[i][j] for j in range(self.q) ] for i in range(self.p) ]
-
-        return Matrix(res)
+        return Matrix([ [ self[i][j] + rhs[i][j] for j in range(self.q) ] for i in range(self.p) ])
     
     def __mul__(self, rhs):
         if isinstance(rhs, int) or isinstance(rhs, float):
@@ -106,7 +100,7 @@ class Matrix:
 
         res = Matrix.zeros(self.p, rhs.q)
         for i in range(self.p):
-            for j in range(self.q):
+            for j in range(rhs.q):
                 res[i][j] = sum([ self[i][k] * rhs[k][j] for k in range(self.q) ])
         
         return res
@@ -174,6 +168,9 @@ def main():
                  [16, 17, 18]])
     m3 = m1 * m2
     print(m3)
+    # [ 84 90 96 ]
+    # [ 201 216 231 ]
+    # [ 318 342 366 ]
 
     m1 = Matrix([[1, 2, 3],
                  [4, 5, 6]])
@@ -182,6 +179,9 @@ def main():
                  [9, 10, 11, 12]])
     m3 = m1 * m2
     print(m3)
+    # [ 38 44 50 56 ]
+    # [ 83 98 113 128 ]
+
 
     print(-1 * m1)
     print(m1 * -1)
@@ -198,6 +198,7 @@ def main():
     print(m1.is_invertible())
     print(m2.is_invertible())
 
+    print("transpose")
     m2 = Matrix([[1, 2, 3, 4],
                 [5, 6, 7, 8],
                 [9, 10, 11, 12]])
