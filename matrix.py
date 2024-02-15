@@ -25,15 +25,20 @@ class Matrix:
         self.q = q
         self.vals = vals
 
+    def __getitem__(self, i):
+        return self.vals[i]
+
     @staticmethod
-    def zeros(n: int):
-        if n < 1:
+    def zeros(p: int, q: int = None):
+        if q is None:
+            q = p
+        if p < 1 or q < 1:
             print("Error: matrix must have positive dimensions.")
             return
-        vals = [[0] * n]
+        vals = [[0] * q]
         # This for loop is necessary because if you simply use another * n,
         # every element of the matrix will become a shallow copy of each other for some reason.
-        for _ in range(n - 1):
+        for _ in range(p - 1):
             vals.append(copy.deepcopy(vals[0]))
         
         return Matrix(vals)
@@ -45,7 +50,7 @@ class Matrix:
             return
         res = Matrix.zeros(n)
         for i in range(n):
-            res.vals[i][i] = 1
+            res[i][i] = 1
         
         return res
     
@@ -56,7 +61,7 @@ class Matrix:
         
         res = 0
         for i in range(self.p):
-            res += self.vals[i][i]
+            res += self[i][i]
         
         return res
     
@@ -82,13 +87,7 @@ class Matrix:
             print("Attempting to add matrices with different dimensions.")
             return
 
-        res = []
-        for lrow, rrow in zip(self.vals, rhs.vals):
-            new_row = lrow.copy()
-            for i, elem in enumerate(rrow):
-                new_row[i] += elem
-            
-            res.append(new_row)
+        res = [ [ self[i][j] + rhs[i][j] for j in range(self.q) ] for i in range(self.p) ]
 
         return Matrix(res)
     
@@ -105,17 +104,12 @@ class Matrix:
             print("Error: incompatible dimensions for dot product.")
             return
 
-        res = []
-        for row in self.vals:
-            new_row = []
-            for j in range(rhs.q):
-                elem = 0
-                for k in range(rhs.p):
-                    elem += row[k] * rhs.vals[k][j]
-                new_row.append(elem)
-            res.append(new_row)
+        res = Matrix.zeros(self.p, rhs.q)
+        for i in range(self.p):
+            for j in range(self.q):
+                res[i][j] = sum([ self[i][k] * rhs[k][j] for k in range(self.q) ])
         
-        return Matrix(res)
+        return res
     
     def __rmul__(self, lhs):
         if not (isinstance(lhs, int) or isinstance(lhs, float)):
@@ -133,7 +127,7 @@ class Matrix:
         if self.p != self.q:
             print("Error: can only exponentiate a square matrix.")
             return
-        if exp == 0:
+        if 0 == exp:
             return Matrix.identity(self.p)
         
         res = Matrix(copy.deepcopy(self.vals))
@@ -150,12 +144,7 @@ class Matrix:
         if self.p != rhs.p or self.q != rhs.q:
             return False
         
-        for i, row in enumerate(self.vals):
-            for j, elem in enumerate(row):
-                if elem != rhs.vals[i][j]:
-                    return False
-        
-        return True
+        return all([ all([ self[i][j] == rhs[i][j] for j in range(self.q) ]) for i in range(self.p)])
 
     def __repr__(self) -> str:
         res = ""
@@ -239,8 +228,3 @@ def main():
                  [4, 5],
                  [7, 8, 9]])
 main()
-
-
-
-
-
