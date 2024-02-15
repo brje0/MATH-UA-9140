@@ -59,11 +59,7 @@ class Matrix:
             print("Error: trace is undefined on a non-square matrix.")
             return
         
-        res = 0
-        for i in range(self.p):
-            res += self[i][i]
-        
-        return res
+        return sum([ self[i][i] for i in range(self.p) ])
     
     def is_square(self) -> bool:
         return self.p == self.q
@@ -228,4 +224,7 @@ def main():
     m1 = Matrix([[1, 2, 3],
                  [4, 5],
                  [7, 8, 9]])
+    
+    m2 = Matrix.identity(3)
+    print(m2.trace())
 main()
