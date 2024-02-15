@@ -2,6 +2,7 @@
 # @author Evan Brody
 # @brief Provides a Matrix class
 import copy
+from functools import reduce
 
 class Matrix:
     # p int number of rows
@@ -14,18 +15,18 @@ class Matrix:
             print("Error: must have a positive number of columns.")
             return
 
-        self.p = len(vals)
-        self.q = len(vals[0])
+        q = len(vals[0])
 
-        for row in vals:
-            if len(row) != self.q:
-                print("Error: inconsistent number of columns.")
-                return
-        
+        if not reduce(lambda a,b: a and len(b) == q, [True] + vals):
+            print("Error: inconsistent number of columns.")
+            return
+
+        self.p = len(vals)
+        self.q = q
         self.vals = vals
 
     @staticmethod
-    def identity(n: int):
+    def zeros(n: int):
         if n < 1:
             print("Error: matrix must have positive dimensions.")
             return
@@ -34,10 +35,19 @@ class Matrix:
         # every element of the matrix will become a shallow copy of each other for some reason.
         for _ in range(n - 1):
             vals.append(copy.deepcopy(vals[0]))
-        for i in range(n):
-            vals[i][i] = 1
         
         return Matrix(vals)
+
+    @staticmethod
+    def identity(n: int):
+        if n < 1:
+            print("Error: matrix must have positive dimensions.")
+            return
+        res = Matrix.zeros(n)
+        for i in range(n):
+            res.vals[i][i] = 1
+        
+        return res
     
     def trace(self) -> float:
         if self.p != self.q:
@@ -86,9 +96,7 @@ class Matrix:
         if isinstance(rhs, int) or isinstance(rhs, float):
             res = []
             for row in self.vals:
-                new_row = []
-                for elem in row:
-                    new_row.append(elem * rhs)
+                new_row = list(map(lambda x: x*rhs, row))
                 res.append(new_row)
             
             return Matrix(res)
@@ -116,11 +124,9 @@ class Matrix:
         
         res = []
         for row in self.vals:
-            new_row = []
-            for elem in row:
-                new_row.append(lhs * elem)
+            new_row = list(map(lambda x: lhs*x, row))
             res.append(new_row)
-        
+
         return Matrix(res)
     
     def __pow__(self, exp):
@@ -226,6 +232,12 @@ def main():
     print(m1 ** 3)
 
     print(Matrix.identity(3))
+    print(3 * Matrix.identity(3))
+    print(Matrix.zeros(4))
+
+    m1 = Matrix([[1, 2, 3],
+                 [4, 5],
+                 [7, 8, 9]])
 main()
 
 
