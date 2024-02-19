@@ -83,23 +83,13 @@ class Matrix:
     
     def __mul__(self, rhs):
         if isinstance(rhs, int) or isinstance(rhs, float):
-            res = []
-            for row in self.vals:
-                new_row = list(map(lambda x: x*rhs, row))
-                res.append(new_row)
-            
-            return Matrix(res)
+            return Matrix([ [ self[i][j] * rhs for j in range(self.q) ] for i in range(self.p) ])
 
         if self.q != rhs.p:
             print("Error: incompatible dimensions for dot product.")
             return
 
-        res = Matrix.zeros(self.p, rhs.q)
-        for i in range(self.p):
-            for j in range(rhs.q):
-                res[i][j] = sum([ self[i][k] * rhs[k][j] for k in range(self.q) ])
-        
-        return res
+        return Matrix([ [ sum([ self[i][k] * rhs[k][j] for k in range(self.q) ]) for j in range(rhs.q) ] for i in range(self.p) ])
     
     def __rmul__(self, lhs):
         if not (isinstance(lhs, int) or isinstance(lhs, float)):
