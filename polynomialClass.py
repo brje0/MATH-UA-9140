@@ -1,51 +1,96 @@
-class PolynomialCalculator:
-    def input(self):
-        print("Enter coefficients of first polynomial separated by spaces:")
-        coeffs1 = list(map(int, input().split()))
-        self.poly1_matrix = Matrix([[Polynomial(coeffs1)]])
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <cmath>
 
-        print("Enter coefficients of second polynomial separated by spaces:")
-        coeffs2 = list(map(int, input().split()))
-        self.poly2_matrix = Matrix([[Polynomial(coeffs2)]])
+// Structure to represent a term in a polynomial expression
+struct Term {
+    int coefficient;
+    int exponent;
+};
 
-    def display(self):
-        print("First Polynomial:")
-        print(self.poly1_matrix)
-        print("Second Polynomial:")
-        print(self.poly2_matrix)
+// Class to represent a polynomial expression
+class Polynomial {
+private:
+    std::vector<Term> terms;
 
-    def add(self):
-        self.poly_sum = self.poly1_matrix + self.poly2_matrix
-        print("Sum of Polynomials:")
-        print(self.poly_sum)
+public:
+    // Method to add a term to the polynomial
+    void addTerm(int coefficient, int exponent) {
+        terms.push_back({coefficient, exponent});
+    }
 
-    def subtract(self):
-        self.poly_diff = self.poly1_matrix - self.poly2_matrix
-        print("Difference of Polynomials:")
-        print(self.poly_diff)
+    // Method to evaluate the polynomial for a given value of x
+    int evaluate(int x) const {
+        int result = 0;
+        for (const auto& term : terms) {
+            result += term.coefficient * std::pow(x, term.exponent);
+        }
+        return result;
+    }
 
-    def multiply(self):
-        self.poly_product = self.poly1_matrix * self.poly2_matrix
-        print("Product of Polynomials:")
-        print(self.poly_product)
+    // Method to convert the polynomial to a string representation
+    std::string toString() const {
+        std::ostringstream oss;
+        for (size_t i = 0; i < terms.size(); ++i) {
+            const auto& term = terms[i];
+            if (i != 0) {
+                oss << " + ";
+            }
+            oss << term.coefficient;
+            if (term.exponent != 0) {
+                oss << "x";
+                if (term.exponent != 1) {
+                    oss << "^" << term.exponent;
+                }
+            }
+        }
+        return oss.str();
+    }
+};
 
-    def read_data(self, path):
-        with open(path, 'r') as file:
-            coeffs1 = list(map(int, file.readline().split()))
-            coeffs2 = list(map(int, file.readline().split()))
-        
-        self.poly1_matrix = Matrix([[Polynomial(coeffs1)]])
-        self.poly2_matrix = Matrix([[Polynomial(coeffs2)]])
+// Class to represent a matrix of polynomial expressions
+class PolyMatrix {
+private:
+    std::vector<std::vector<Polynomial>> matrix;
 
-    def write_data(self, path):
-        with open(path, 'w') as file:
-            file.write("First Polynomial:\n")
-            file.write(str(self.poly1_matrix) + "\n")
-            file.write("Second Polynomial:\n")
-            file.write(str(self.poly2_matrix) + "\n")
-            file.write("Sum of Polynomials:\n")
-            file.write(str(self.poly_sum) + "\n")
-            file.write("Difference of Polynomials:\n")
-            file.write(str(self.poly_diff) + "\n")
-            file.write("Product of Polynomials:\n")
-            file.write(str(self.poly_product) + "\n")
+public:
+    // Method to add a polynomial expression to the matrix at a specific row and column
+    void setElement(int row, int col, const Polynomial& polynomial) {
+        if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size()) {
+            matrix[row][col] = polynomial;
+        }
+    }
+
+    // Method to retrieve a polynomial expression from the matrix at a specific row and column
+    Polynomial getElement(int row, int col) const {
+        if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size()) {
+            return matrix[row][col];
+        } else {
+            // Return an empty polynomial if indices are out of bounds
+            return Polynomial();
+        }
+    }
+};
+
+int main() {
+    // Example usage
+    PolyMatrix polyMatrix;
+
+    Polynomial poly1;
+    poly1.addTerm(3, 2); // 3x^2
+    poly1.addTerm(2, 1); // 2x
+    poly1.addTerm(1, 0); // 1
+    polyMatrix.setElement(0, 0, poly1);
+
+    Polynomial poly2;
+    poly2.addTerm(1, 1); // x
+    poly2.addTerm(2, 0); // 2
+    polyMatrix.setElement(0, 1, poly2);
+
+    Polynomial poly3 = polyMatrix.getElement(0, 0);
+    std::cout << "Element at (0, 0): " << poly3.toString() << std::endl;
+
+    return 0;
+}
