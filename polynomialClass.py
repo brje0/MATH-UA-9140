@@ -1,96 +1,59 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <cmath>
+class Term:
+    def __init__(self, coefficient, exponent):
+        self.coefficient = coefficient
+        self.exponent = exponent
 
-// Structure to represent a term in a polynomial expression
-struct Term {
-    int coefficient;
-    int exponent;
-};
+class Polynomial:
+    def __init__(self):
+        self.terms = []
 
-// Class to represent a polynomial expression
-class Polynomial {
-private:
-    std::vector<Term> terms;
+    def add_term(self, coefficient, exponent):
+        self.terms.append(Term(coefficient, exponent))
 
-public:
-    // Method to add a term to the polynomial
-    void addTerm(int coefficient, int exponent) {
-        terms.push_back({coefficient, exponent});
-    }
+    def evaluate(self, x):
+        result = 0
+        for term in self.terms:
+            result += term.coefficient * (x ** term.exponent)
+        return result
 
-    // Method to evaluate the polynomial for a given value of x
-    int evaluate(int x) const {
-        int result = 0;
-        for (const auto& term : terms) {
-            result += term.coefficient * std::pow(x, term.exponent);
-        }
-        return result;
-    }
+    def __str__(self):
+        terms_str = []
+        for term in self.terms:
+            if term.exponent == 0:
+                terms_str.append(str(term.coefficient))
+            elif term.exponent == 1:
+                terms_str.append(f"{term.coefficient}x")
+            else:
+                terms_str.append(f"{term.coefficient}x^{term.exponent}")
+        return " + ".join(terms_str)
 
-    // Method to convert the polynomial to a string representation
-    std::string toString() const {
-        std::ostringstream oss;
-        for (size_t i = 0; i < terms.size(); ++i) {
-            const auto& term = terms[i];
-            if (i != 0) {
-                oss << " + ";
-            }
-            oss << term.coefficient;
-            if (term.exponent != 0) {
-                oss << "x";
-                if (term.exponent != 1) {
-                    oss << "^" << term.exponent;
-                }
-            }
-        }
-        return oss.str();
-    }
-};
+class PolyMatrix:
+    def __init__(self, rows, cols):
+        self.matrix = [[Polynomial() for _ in range(cols)] for _ in range(rows)]
 
-// Class to represent a matrix of polynomial expressions
-class PolyMatrix {
-private:
-    std::vector<std::vector<Polynomial>> matrix;
+    def set_element(self, row, col, polynomial):
+        if 0 <= row < len(self.matrix) and 0 <= col < len(self.matrix[0]):
+            self.matrix[row][col] = polynomial
 
-public:
-    // Method to add a polynomial expression to the matrix at a specific row and column
-    void setElement(int row, int col, const Polynomial& polynomial) {
-        if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size()) {
-            matrix[row][col] = polynomial;
-        }
-    }
+    def get_element(self, row, col):
+        if 0 <= row < len(self.matrix) and 0 <= col < len(self.matrix[0]):
+            return self.matrix[row][col]
+        else:
+            return Polynomial()
 
-    // Method to retrieve a polynomial expression from the matrix at a specific row and column
-    Polynomial getElement(int row, int col) const {
-        if (row >= 0 && row < matrix.size() && col >= 0 && col < matrix[0].size()) {
-            return matrix[row][col];
-        } else {
-            // Return an empty polynomial if indices are out of bounds
-            return Polynomial();
-        }
-    }
-};
+# Example usage
+poly_matrix = PolyMatrix(1, 2)
 
-int main() {
-    // Example usage
-    PolyMatrix polyMatrix;
+poly1 = Polynomial()
+poly1.add_term(3, 2)  # 3x^2
+poly1.add_term(2, 1)  # 2x
+poly1.add_term(1, 0)  # 1
+poly_matrix.set_element(0, 0, poly1)
 
-    Polynomial poly1;
-    poly1.addTerm(3, 2); // 3x^2
-    poly1.addTerm(2, 1); // 2x
-    poly1.addTerm(1, 0); // 1
-    polyMatrix.setElement(0, 0, poly1);
+poly2 = Polynomial()
+poly2.add_term(1, 1)  # x
+poly2.add_term(2, 0)  # 2
+poly_matrix.set_element(0, 1, poly2)
 
-    Polynomial poly2;
-    poly2.addTerm(1, 1); // x
-    poly2.addTerm(2, 0); // 2
-    polyMatrix.setElement(0, 1, poly2);
-
-    Polynomial poly3 = polyMatrix.getElement(0, 0);
-    std::cout << "Element at (0, 0): " << poly3.toString() << std::endl;
-
-    return 0;
-}
+poly3 = poly_matrix.get_element(0, 0)
+print("Element at (0, 0):", poly3)
