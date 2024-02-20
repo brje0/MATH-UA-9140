@@ -127,14 +127,16 @@ class Matrix:
         return all([ all([ self[i][j] == rhs[i][j] for j in range(self.q) ]) for i in range(self.p)])
 
     def __repr__(self) -> str:
+        col_lengths = [max(len(str(self[i][j])) for i in range(self.p)) for j in range(self.q)]
+
         res = ""
-        for row in self.vals:
+        for i in range(self.p):
             srow = "[ "
-            for elem in row:
-                srow += str(elem) + ' '
+            for j in range(self.q):
+                srow += f"{self[i][j]:<{col_lengths[j]}} "
             srow += "]\n"
             res += srow
-        
+
         return res
 
 def main():
