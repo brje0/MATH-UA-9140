@@ -5,6 +5,7 @@
 import copy
 from functools import reduce
 from complex import Complex
+import math
 
 class Matrix:
     # p int number of rows
@@ -162,15 +163,20 @@ class Matrix:
 
         return Matrix(res)
     
-    def __pow__(self, exp):
+    def __pow__(self, n):
         if self.p != self.q:
             print("Error: can only exponentiate a square matrix.")
             return
-        if 0 == exp:
+        if 0 == n:
             return Matrix.identity(self.p)
         
         res = Matrix(copy.deepcopy(self.vals))
-        for _ in range(exp - 1):
+        
+        log2n = math.floor(math.log(n, 2))
+        for _ in range(log2n):
+            res *= res
+        
+        for _ in range(n - (2 ** log2n)):
             res *= self
 
         return res
@@ -302,9 +308,15 @@ def test():
                  [Complex(-4, 1), Complex(-5, 1), Complex(-6, 1), Complex(-7, 1)]])
     print(m1.det())
 
-    m = Matrix([[Complex(2), Complex(3)],
+    m = Matrix([[Complex(2, 1), Complex(3)],
                 [Complex(2), Complex(2)]])
     print(m.inverse())
+    print(m * m.inverse())
+
+    m = Matrix([[2, 0, 0],
+                [0, 2, 0],
+                [0, 0, 2]])
+    print(m ** 9)
 
 if __name__ == "__main__":
     test()
