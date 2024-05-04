@@ -12,17 +12,14 @@ class Matrix:
     # q int number of columns
     def __init__(self, vals: list = [[0]]) -> None:
         if len(vals) < 1:
-            print("Error: must have a positive number of rows.")
-            return
+            raise Exception("Error: must have a positive number of rows.")
         if len(vals[0]) < 1:
-            print("Error: must have a positive number of columns.")
-            return
+            raise Exception("Error: must have a positive number of columns.")
 
         q = len(vals[0])
 
         if not reduce(lambda a,b: a and len(b) == q, [True] + vals):
-            print("Error: inconsistent number of columns.")
-            return
+            raise Exception("Error: inconsistent number of columns.")
 
         self.p = len(vals)
         self.q = q
@@ -36,8 +33,8 @@ class Matrix:
         if q is None:
             q = p
         if p < 1 or q < 1:
-            print("Error: matrix must have positive dimensions.")
-            return
+            raise Exception("Error: matrix must have positive dimensions.")
+
         vals = [[0] * q]
         # This for loop is necessary because if you simply use another * n,
         # every element of the matrix will become a shallow copy of each other for some reason.
@@ -49,8 +46,8 @@ class Matrix:
     @staticmethod
     def identity(n: int):
         if n < 1:
-            print("Error: matrix must have positive dimensions.")
-            return
+            raise Exception("Error: matrix must have positive dimensions.")
+
         res = Matrix.zeros(n)
         for i in range(n):
             res[i][i] = 1
@@ -59,9 +56,8 @@ class Matrix:
     
     def trace(self) -> float:
         if self.p != self.q:
-            print("Error: trace is undefined on a non-square matrix.")
-            return
-        
+            raise Exception("Error: trace is undefined on a non-square matrix.")
+
         return sum([ self[i][i] for i in range(self.p) ])
     
     def is_square(self) -> bool:
@@ -69,8 +65,7 @@ class Matrix:
 
     def is_invertible(self) -> bool:
         if self.p != self.q:
-            print("Error: invertibility only defined for square matrices.")
-            return
+            raise Exception("Error: invertibility only defined for square matrices.")
 
         return abs(self.det()) >= 0.001
 
@@ -82,8 +77,7 @@ class Matrix:
 
     def inverse(self):
         if not self.is_invertible():
-            print("Error: this matrix is not invertible.")
-            return
+            raise Exception("Error: this matrix is not invertible.")
 
         mcopy = self.copy()
         res = Matrix.identity(self.p)
@@ -107,8 +101,7 @@ class Matrix:
 
     def det(self) -> float:
         if self.p != self.q:
-            print("Error: determinant undefined for non-square matrices.")
-            return
+            raise Exception("Error: determinant undefined for non-square matrices.")
 
         if self.p == 2 and self.q == 2:
             return self.vals[0][0] * self.vals[1][1] - self.vals[0][1] * self.vals[1][0]
@@ -133,8 +126,7 @@ class Matrix:
 
     def __add__(self, rhs):
         if self.p != rhs.p or self.q != rhs.q:
-            print("Attempting to add matrices with different dimensions.")
-            return
+            raise Exception("Error: attempting to add matrices with different dimensions.")
 
         return Matrix([ [ self[i][j] + rhs[i][j] for j in range(self.q) ] for i in range(self.p) ])
 
@@ -146,15 +138,14 @@ class Matrix:
             return Matrix([ [ self[i][j] * rhs for j in range(self.q) ] for i in range(self.p) ])
 
         if self.q != rhs.p:
-            print("Error: incompatible dimensions for dot product.")
+            raise Exception("Error: incompatible dimensions for dot product.")
             return
 
         return Matrix([ [ sum([ self[i][k] * rhs[k][j] for k in range(self.q) ]) for j in range(rhs.q) ] for i in range(self.p) ])
     
     def __rmul__(self, lhs):
         if not (isinstance(lhs, int) or isinstance(lhs, float)):
-            print("Error: must only multiply by a matrix or a scalar.")
-            return
+            raise Exception("Error: must only multiply by a matrix or a scalar.")
         
         res = []
         for row in self.vals:
@@ -165,8 +156,7 @@ class Matrix:
     
     def __pow__(self, n):
         if self.p != self.q:
-            print("Error: can only exponentiate a square matrix.")
-            return
+            raise Exception("Error: can only exponentiate a square matrix.")
         if 0 == n:
             return Matrix.identity(self.p)
         
@@ -190,9 +180,8 @@ class Matrix:
 
     def __eq__(self, rhs) -> bool:
         if not isinstance(rhs, Matrix):
-            print("Error: equality check is only defined for other matrices.")
-            return
-        
+            raise Exception("Error: equality check is only defined for other matrices.")
+
         if self.p != rhs.p or self.q != rhs.q:
             return False
         
