@@ -108,7 +108,6 @@ def main():
     choice = input("Choose an operation: ").upper()
 
     m = get_matrix()
-    m.inverse()
 
     match choice:
         case 'S':
