@@ -75,8 +75,7 @@ def pretty_print(vals):
 
     print(res[:-1], end='')
 
-def get_matrix():
-    p, q = get_dims()
+def get_matrix(p, q):
     print("Enter your matrix:")
     vals = []
     for _ in range(p):
@@ -97,42 +96,45 @@ def get_dims():
     return p, q
 
 def main():
-    print("""
-        S: Sum
-        P: Product
-        E: Exponentiation
-        T: Trace
-        D: Determinant
-        I: Inverse
-          """)
-    choice = input("Choose an operation: ").upper()
+    res = m = get_matrix(*get_dims())
+    while True:
+        os.system("cls" if os.name == "nt" else "clear")
+        print(res, '\n')
+        print("""S: Sum
+P: Product
+E: Exponentiation
+T: Trace
+D: Determinant
+I: Inverse
+Q: Quit""")
+        choice = input("Choose an operation: ").upper()
 
-    m = get_matrix()
-
-    match choice:
-        case 'S':
-            m2 = get_matrix()
-            print("Sum:")
-            print(m + m2)
-        case 'P':
-            m2 = get_matrix()
-            print("Product:")
-            print(m * m2)
-        case 'E':
-            n = int(input("Enter the power to raise this matrix to: "))
-            print("Result:")
-            print(m ** n)
-        case 'T':
-            print("Trace:")
-            print(m.trace())
-        case 'D':
-            print("Determinant:")
-            print(m.det())
-        case 'I':
-            print("Inverse:")
-            print(m.inverse())
-        case _:
-            print("Invalid operation selected.")
+        match choice:
+            case 'S':
+                m2 = get_matrix(m.p, m.q)
+                print("Sum:")
+                res = m = m + m2
+            case 'P':
+                m2 = get_matrix(m.q, int(input("How many columns ? ")))
+                print("Product:")
+                res = m = m * m2
+            case 'E':
+                n = int(input("Enter the power to raise this matrix to: "))
+                print("Result:")
+                res = m = m ** n
+            case 'T':
+                print("Trace:")
+                res = m.trace()
+            case 'D':
+                print("Determinant:")
+                res = m.det()
+            case 'I':
+                print("Inverse:")
+                res = m = m.inverse()
+            case 'Q':
+                return
+            case _:
+                print("Invalid operation selected.")
 
 if __name__ == "__main__":
     main()

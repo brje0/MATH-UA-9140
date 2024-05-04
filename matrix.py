@@ -170,14 +170,21 @@ class Matrix:
         if 0 == n:
             return Matrix.identity(self.p)
         
-        res = Matrix(copy.deepcopy(self.vals))
+        base = self
+        
+        if n > 0:
+            res = Matrix(copy.deepcopy(self.vals))
+        else:
+            base = self.inverse()
+            res = self.inverse()
+            n = abs(n)
         
         log2n = math.floor(math.log(n, 2))
         for _ in range(log2n):
             res *= res
         
         for _ in range(n - (2 ** log2n)):
-            res *= self
+            res *= base
 
         return res
 
@@ -317,6 +324,7 @@ def test():
                 [0, 2, 0],
                 [0, 0, 2]])
     print(m ** 9)
+    print(m ** -2)
 
 if __name__ == "__main__":
     test()
