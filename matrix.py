@@ -1,8 +1,10 @@
 # @file matrix.py
 # @author Evan Brody
 # @brief Provides a Matrix class
+
 import copy
 from functools import reduce
+from complex import Complex
 
 class Matrix:
     # p int number of rows
@@ -65,14 +67,68 @@ class Matrix:
         return self.p == self.q
 
     def is_invertible(self) -> bool:
-        if self.p != 2 or self.q != 2:
-            print("Error: is_invertible() only defined for 2x2 matrices.")
+        if self.p != self.q:
+            print("Error: invertibility only defined for square matrices.")
             return
 
-        return 0 != self.vals[0][0] * self.vals[1][1] - self.vals[0][1] * self.vals[1][0]
+        return abs(self.det()) >= 0.001
 
     def transpose(self):
         return Matrix([ [ self[i][j] for i in range(self.p) ] for j in range(self.q) ])
+
+    def copy(self):
+        return Matrix([ [ e for e in r ] for r in self.vals ])
+
+    def inverse(self):
+        if not self.is_invertible():
+            print("Error: this matrix is not invertible.")
+            return
+
+        mcopy = self.copy()
+        res = Matrix.identity(self.p)
+        vals = mcopy.vals
+        for i, row in enumerate(vals):
+            div = row[i]
+            for j in range(len(row)):
+                row[j] /= div
+                res[i][j] /= div
+
+            for i2 in range(len(vals)):
+                if i == i2:
+                    continue
+
+                sub_mul = vals[i2][i]
+                for j in range(len(vals[i2])):
+                    vals[i2][j] -= vals[i][j] * sub_mul
+                    res[i2][j] -= res[i][j] * sub_mul
+
+        return res
+
+    def det(self) -> float:
+        if self.p != self.q:
+            print("Error: determinant undefined for non-square matrices.")
+            return
+
+        if self.p == 2 and self.q == 2:
+            return self.vals[0][0] * self.vals[1][1] - self.vals[0][1] * self.vals[1][0]
+
+        res = 0
+        sign = 1
+        for i, e in enumerate(self.vals[0]):
+            sub_res = sign * e
+
+            sub_vals = self.vals[1:]
+            for j in range(len(sub_vals)):
+                sub_vals[j] = sub_vals[j][:i] + sub_vals[j][i + 1:]
+            sub_res *= Matrix(sub_vals).det()
+
+            res += sub_res
+            sign = -sign
+
+        return res
+
+    def __neg__(self):
+        return Matrix([ [ -e for e in r ] for r in self.vals ])
 
     def __add__(self, rhs):
         if self.p != rhs.p or self.q != rhs.q:
@@ -80,7 +136,10 @@ class Matrix:
             return
 
         return Matrix([ [ self[i][j] + rhs[i][j] for j in range(self.q) ] for i in range(self.p) ])
-    
+
+    def __sub__(self, rhs):
+        return self + (-rhs)
+
     def __mul__(self, rhs):
         if isinstance(rhs, int) or isinstance(rhs, float):
             return Matrix([ [ self[i][j] * rhs for j in range(self.q) ] for i in range(self.p) ])
@@ -124,7 +183,7 @@ class Matrix:
         if self.p != rhs.p or self.q != rhs.q:
             return False
         
-        return all([ all([ self[i][j] == rhs[i][j] for j in range(self.q) ]) for i in range(self.p)])
+        return all([ all([ self[i][j] == rhs[i][j] for j in range(self.q) ]) for i in range(self.p) ])
 
     def __repr__(self) -> str:
         col_lengths = [max(len(str(self[i][j])) for i in range(self.p)) for j in range(self.q)]
@@ -133,14 +192,13 @@ class Matrix:
         for i in range(self.p):
             srow = "[ "
             for j in range(self.q):
-                srow += f"{self[i][j]:<{col_lengths[j]}} "
+                srow += f"{str(self[i][j]):>{col_lengths[j]}} "
             srow += "]\n"
             res += srow
 
         return res
 
-def main():
-    # Testing code
+def test():
     m1 = Matrix([[1, 1],
                 [2, 2]])
     m2 = Matrix([[3, 3],
@@ -216,7 +274,37 @@ def main():
     m1 = Matrix([[1, 2, 3],
                  [4, 5],
                  [7, 8, 9]])
-    
+
+    m1 = Matrix()
+
     m2 = Matrix.identity(3)
     print(m2.trace())
-main()
+
+    m1 = Matrix([[Complex(0, 1), Complex(), Complex()],
+                 [Complex(), Complex(0, 1), Complex()],
+                 [Complex(), Complex(), Complex(0, 1)]])
+    m2 = Matrix([[Complex(0, 1), Complex(), Complex()],
+                [Complex(), Complex(0, 1), Complex()],
+                [Complex(), Complex(), Complex(0, 1)]])
+    print()
+    print(m1 * m2)
+
+    m1 = Matrix([[1, 2, 3],
+                 [4, 5, 6],
+                 [7, 8, 9]])
+
+    print(m1.det())
+    print()
+
+    m1 = Matrix([[Complex(1, 1), Complex(2, 1), Complex(3, 1), Complex(4, 1)],
+                [Complex(5, 1), Complex(6, 1), Complex(7, 1), Complex(8, 1)],
+                [Complex(9, 1), Complex(-1, 1), Complex(-2, 1), Complex(-3, 1)],
+                 [Complex(-4, 1), Complex(-5, 1), Complex(-6, 1), Complex(-7, 1)]])
+    print(m1.det())
+
+    m = Matrix([[Complex(2), Complex(3)],
+                [Complex(2), Complex(2)]])
+    print(m.inverse())
+
+if __name__ == "__main__":
+    test()
