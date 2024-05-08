@@ -28,6 +28,9 @@ class Matrix:
     def __getitem__(self, i):
         return self.vals[i]
 
+    def __setitem__(self, i, new_val):
+        self.vals[i] = new_val
+
     @staticmethod
     def zeros(p: int, q: int = None):
         if q is None:
@@ -273,9 +276,10 @@ def test():
     print(3 * Matrix.identity(3))
     print(Matrix.zeros(4))
 
-    m1 = Matrix([[1, 2, 3],
-                 [4, 5],
-                 [7, 8, 9]])
+    # Invalid; inconsistent num of columns
+    # m1 = Matrix([[1, 2, 3],
+    #              [4, 5],
+    #              [7, 8, 9]])
 
     m1 = Matrix()
 

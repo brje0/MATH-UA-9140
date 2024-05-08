@@ -10,6 +10,12 @@ class Complex:
     def __abs__(self) -> float:
         return (self.r ** 2 + self.c ** 2) ** 0.5
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Complex):
+            return self.r == other.r and self.c == other.c
+        else:
+            return self.r == other and self.c == 0
+
     def __neg__(self):
         return Complex(-self.r, -self.c)
 

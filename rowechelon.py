@@ -1,3 +1,7 @@
+# @file rowechelon.py
+# @author Aymane Omari
+# @brief Provides REF functionality for the Matrix class
+
 from matrix import Matrix
 import copy
 
@@ -27,6 +31,7 @@ def row_echelon(matrix):
 
         # Scale the current row to make the leading entry 1
         lv = mat[r][lead]
+        if lv == 0: raise Exception("Error: ")
         mat[r] = [x / lv for x in mat[r]]
 
         # Eliminate the leading entry from all other rows

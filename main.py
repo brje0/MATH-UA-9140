@@ -4,6 +4,7 @@
 
 from matrix import Matrix
 from complex import Complex
+from rowechelon import row_echelon
 import os
 
 def str_to_complex(s: str):
@@ -103,9 +104,11 @@ def main():
         print("""S: Sum
 P: Product
 E: Exponentiation
-T: Trace
+T: Transpose
+TR: Trace
 D: Determinant
 I: Inverse
+R: Row Echelon Form
 Q: Quit""")
         choice = input("Choose an operation: ").upper()
 
@@ -123,6 +126,9 @@ Q: Quit""")
                 print("Result:")
                 res = m = m ** n
             case 'T':
+                print("Transpose:")
+                res = m.transpose()
+            case 'TR':
                 print("Trace:")
                 res = m.trace()
             case 'D':
@@ -131,6 +137,9 @@ Q: Quit""")
             case 'I':
                 print("Inverse:")
                 res = m = m.inverse()
+            case 'R':
+                print("REF Form:")
+                res = m = row_echelon(m)
             case 'Q':
                 return
             case _:
